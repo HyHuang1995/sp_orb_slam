@@ -42,7 +42,7 @@ apt-get install python-wstool python-catkin-tools
 apt-get install libopencv-dev
 ```
 
-4. CUDA 9.2 tookit, cuDNN 7.6 (change appropriate version of libtorch in [install.sh](https://github.com/HyHuang1995/sp_orb_slam/install.sh))
+4. CUDA tookit, cuDNN (change the version of libtorch in [install.sh](https://github.com/HyHuang1995/sp_orb_slam/blob/master/install.sh) according to CUDA version)
 
 5. [Pangolin](https://github.com/stevenlovegrove/Pangolin) (optional, for visualization)
 
