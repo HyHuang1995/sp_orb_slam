@@ -25,7 +25,7 @@ alt="gmmloc" width="640" height="320" border="10" /></a>
 
 ## Prerequisites
 
-We have tested this library in Ubuntu 18.04 with CUDA 9.2 and CUDA 10.1. Prerequisites for installation:
+We have tested this library in Ubuntu 18.04 with CUDA 9.2 and cuDNN 7.6. Prerequisites for installation:
 
 1. [ROS](http://wiki.ros.org/melodic/Installation) (ros-base is enough)
 ```
@@ -42,9 +42,11 @@ apt-get install python-wstool python-catkin-tools
 apt-get install libopencv-dev
 ```
 
-4. [Pangolin](https://github.com/stevenlovegrove/Pangolin) (optional, for visualization)
+4. CUDA 9.2 tookit, cuDNN 7.6 (change appropriate version of libtorch in [install.sh](https://github.com/HyHuang1995/sp_orb_slam/install.sh))
 
-4. [evo](https://github.com/MichaelGrupp/evo) (optional, for evaluation)
+5. [Pangolin](https://github.com/stevenlovegrove/Pangolin) (optional, for visualization)
+
+6. [evo](https://github.com/MichaelGrupp/evo) (optional, for evaluation)
 ```
 pip install evo --upgrade --no-binary evo
 ```
