@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="gdb" default="false" />
+    <arg name="verbose" default="false" />
+    <arg name="seq" default="lamps" />
+    <arg name="online" default="true" />
+    <arg name="viewer" default="true" />
+
+    <arg if="$(arg gdb)" name="prefix" value="gdb -ex run --args" />
+    <arg unless="$(arg gdb)" name="prefix" value="" />
+    <arg if="$(arg verbose)" name="args" value="-alsologtostderr -colorlogtostderr" />
+    <arg unless="$(arg verbose)" name="args" value="-alsologtostderr -colorlogtostderr --minloglevel=1" />
+
+    <node name="orb_slam" pkg="orb_slam2" type="mono_node" args="$(arg args)" launch-prefix="$(arg prefix)" output="screen" clear_params="true">
+        <param name="data_path" value="/PATH/TO/TSUKUBA/DATASET" />
+        <param name="sequence" value="$(arg seq)" />
+
+        <param name="visualize" value="$(arg viewer)" />
+        <param name="verbose" value="$(arg verbose)" />
+
+        <param name="online" value="$(arg online)" />
+        <param name="dataset" value="tsukuba" />
+        <param name="output_path" value="$(find orb_ros)/expr/" />
+
+        <param name="model_path" value="$(find orb_ros)/data/models/superpoint.pt" />
+
+        <rosparam command="load" file="$(find orb_ros)/cfg/tsukuba.yaml" />
+    </node>
+</launch>

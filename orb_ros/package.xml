@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>orb_ros</name>
+  <version>0.0.0</version>
+  <description>ORB_SLAM2 ros wrapper</description>
+
+  <maintainer email="hyhuang1995@gmail.com">hyhuang</maintainer>
+
+  <license>GPL-v3</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>catkin_simple</buildtool_depend>
+
+  <depend>orb_slam2</depend>
+  <!--depend>sophus_catkin</depend-->
+</package>

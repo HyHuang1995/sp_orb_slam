@@ -1,0 +1,64 @@
+# %YAML:1.0
+
+use_loop: False
+
+sensor_type: 0
+camera:
+  width: 752
+  height: 480
+  fx: 356.1094055175781
+  fy: 418.0326843261719
+  cx: 362.7542616160936
+  cy: 250.18023338917374
+
+  # 0, 1, 2
+  distortion_type: 0
+  distortion: [-0.28340811, 0.07395907, 0.00019359, 1.76187114e-05]
+  is_rgb: True
+  fps: 20.0
+
+tracking:
+  extractor_type: 1
+  num_features: 800
+
+  scale_check: False
+  create_kf_tracked_over_ref: 0.5
+  create_kf_tracked_over_curr: 0.4
+  create_kf_ref_ratio: 0.7
+  create_kf_nmatch: 5
+
+  dust:
+    c2_thresh: 81.0
+    th_ratio: 0.35
+    th_ninlier: 20
+    th_nmatch: 20
+
+  motion:
+    th_window_size: 15
+    th_nmatch_proj: 20
+    th_nmatch_opt: 10
+    th_nn_ratio: 1.0
+
+  map:
+    th_window_size: 1
+    th_ninlier_high: 50
+    th_ninlier_low: 6
+    th_nn_ratio: 1.0
+    match_adaptive: True
+
+mapping:
+  culling_kf: true
+  kf_culling_cov_ratio: 0.95
+  kf_culling_num_obs: 5
+  triangulation_nn_ratio: 1.0
+  triangulation_num_kfs: 8
+  matching_method: 1
+
+viewer:
+  keyframe_size: 0.05
+  keyframe_line_width: 1.5
+  graph_line_width: 2.0
+  point_size: 2.5
+  camera_size: 0.05
+  camera_line_width: 1.5
+  viewpoint: [0, -0.3, -1.4, 500]

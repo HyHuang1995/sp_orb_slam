@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="gdb" default="false" />
+    <arg name="verbose" default="false" />
+    <arg name="seq" default="MH_01_easy" />
+    <arg name="online" default="true" />
+    <arg name="viewer" default="true" />
+
+    <arg if="$(arg gdb)" name="prefix" value="gdb -ex run --args" />
+    <arg unless="$(arg gdb)" name="prefix" value="" />
+	<arg if="$(arg verbose)" name="args" value="-alsologtostderr -colorlogtostderr --log_dir=$(find orb_ros)/log" />
+    <arg unless="$(arg verbose)" name="args" value="-alsologtostderr -colorlogtostderr --minloglevel=1" />
+
+    <node name="slam" pkg="orb_slam2" type="mono_node" args="$(arg args)" launch-prefix="$(arg prefix)" output="screen" clear_params="true">
+        <param name="data_path" value="/PATH/TO/EUROC/DATASET/$(arg seq)/mav0/" />
+
+        <param name="log_path" value="$(find orb_ros)/log" />
+
+        <param name="visualize" value="$(arg viewer)" />
+        <param name="online" value="$(arg online)" />
+        <param name="verbose" value="$(arg verbose)" />
+
+        <param name="dataset" value="euroc" />
+        <param name="output_path" value="$(find orb_ros)/expr/" />
+
+        <param name="model_path" value="$(find orb_ros)/data/models/superpoint.pt" />
+
+        <rosparam command="load" file="$(find orb_ros)/cfg/euroc_mono.yaml" />
+    </node>
+</launch>

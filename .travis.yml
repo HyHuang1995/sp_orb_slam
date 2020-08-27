@@ -1,0 +1,88 @@
+dist: bionic
+sudo: required
+cache:
+    - apt
+env:
+    global:
+    - ROS_CI_DESKTOP="bionic"
+    - ROS_DISTRO="melodic"
+    - CI_SOURCE_PATH=$(pwd)
+
+matrix:
+  include:
+    - name: CUDA 10
+      env:
+      - CUDA=10.1.105-1
+      - CUDA_SHORT=10.1
+      - UBUNTU_VERSION=ubuntu1804
+      dist: bionic
+
+before_install:
+    - sudo sh -c "echo \"deb http://packages.ros.org/ros/ubuntu $ROS_CI_DESKTOP main\" > /etc/apt/sources.list.d/ros-latest.list"
+    - sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+    - sudo apt-get update
+    - sudo apt-get install dpkg wget
+    - sudo apt-get install libglew-dev libgl1-mesa-dev # for pangolin
+    - sudo apt-get install -y libeigen3-dev libqglviewer-dev-qt5 libopencv-dev libsuitesparse-dev
+    - sudo apt-get install -y python-catkin-pkg python-rosdep python-wstool 
+    - sudo apt-get install python-wstool python-catkin-tools ros-$ROS_DISTRO-ros-base ros-melodic-cmake-modules
+    - source /opt/ros/$ROS_DISTRO/setup.bash
+
+    # install cuda
+    - INSTALLER=cuda-repo-${UBUNTU_VERSION}_${CUDA}_amd64.deb
+    - wget http://developer.download.nvidia.com/compute/cuda/repos/${UBUNTU_VERSION}/x86_64/${INSTALLER}
+    - sudo dpkg -i ${INSTALLER}
+    - wget https://developer.download.nvidia.com/compute/cuda/repos/${UBUNTU_VERSION}/x86_64/7fa2af80.pub
+    - sudo apt-key add 7fa2af80.pub
+    - sudo apt update -qq
+    - sudo apt install -y cuda-core-${CUDA_SHORT/./-} cuda-cudart-dev-${CUDA_SHORT/./-} cuda-cufft-dev-${CUDA_SHORT/./-} cuda-toolkit-${CUDA_SHORT/./-} cuda-nvrtc-${CUDA_SHORT/./-} cuda-nvtx-${CUDA_SHORT/./-}
+    - sudo apt clean
+    - CUDA_HOME=/usr/local/cuda-${CUDA_SHORT}
+    - LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
+    - PATH=${CUDA_HOME}/bin:${PATH}
+
+    # install cudnn
+    - cd ~
+    - wget -c https://developer.download.nvidia.com/compute/machine-learning/cudnn/secure/7.6.5.32/Production/10.1_20191031/cudnn-10.1-linux-x64-v7.6.5.32.tgz?I20smgFaGY9E_NkrgSMAS2CEVXe-eNbnejRJHUcYVG-v9_-ZWcgsE0uhb0fo5X2PC-ATJQkTPOD7dtvFF2EzSyTDLjfKQlb8zLQAVFylFa_SwmzrtNR0ETRcZgB_e1JYr9K86Ikgg50VE6VUxPHU--lF1CEPX9K0tyRPRa1Rp1O83Iaj2Dj54w__qw2DiDC6p9uaH0A3EJkVBxnj09Y0SZ6nubyAj0qhZg
+    - tar -xzvf cudnn-10.1-linux-x64-v7.6.5.32.tgz\?I20smgFaGY9E_NkrgSMAS2CEVXe-eNbnejRJHUcYVG-v9_-ZWcgsE0uhb0fo5X2PC-ATJQkTPOD7dtvFF2EzSyTDLjfKQlb8zLQAVFylFa_SwmzrtNR0ETRcZgB_e1JYr9K86Ikgg50VE6VUxPHU--lF1CEPX9K0tyRPRa1Rp1O83Iaj2Dj54w__qw2DiDC6p9uaH0A3E
+    - sudo cp -P cuda/include/cudnn.h /usr/local/cuda-10.1/include
+    - sudo cp -P cuda/lib64/libcudnn* /usr/local/cuda-10.1/lib64/
+    - sudo chmod a+r /usr/local/cuda-10.1/lib64/libcudnn*
+
+install:
+    # install pangolin
+    - cd ~
+    - git clone https://github.com/stevenlovegrove/Pangolin.git
+    - cd Pangolin
+    - mkdir build
+    - cd build
+    - cmake ..
+    - cmake --build .
+    - sudo make install
+
+    - mkdir -p ~/catkin_ws/src
+    - cd ~/catkin_ws/
+
+    # init catkin
+    - catkin init
+    - catkin config --extend /opt/ros/melodic
+    - catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
+    - catkin config --merge-devel
+
+
+    # create symbolic
+    - cd src
+    - ln -s $CI_SOURCE_PATH ./sp_orb_slam
+
+    - wget -c https://download.pytorch.org/libtorch/cu101/libtorch-cxx11-abi-shared-with-deps-1.6.0%2Bcu101.zip
+    - unzip libtorch-cxx11-abi-shared-with-deps-1.6.0+cu101.zip
+    - mv libtorch ./sp_orb_slam/orb_slam2/3rdparty
+
+    # install deps
+    - wstool init . ./sp_orb_slam/.spslam_https.install
+    - wstool update
+
+before_script:
+    - echo $(pwd)
+script:
+    - catkin build orb_ros --verbose
